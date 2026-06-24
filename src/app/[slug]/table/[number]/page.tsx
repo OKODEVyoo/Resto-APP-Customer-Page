@@ -23,8 +23,12 @@ export default async function Page({ params }: Props) {
     ;[restaurant, table] = await Promise.all([api.getRestaurant(slug), api.getTable(slug, number)])
   } catch (err) {
     const msg = err instanceof Error ? err.message : ''
-    if (msg.includes('not found') || msg.includes('inactive') || msg.includes('not active')) notFound()
-    notFound()
+    // Only treat explicit business-logic rejections as 404 — everything else
+    // (network failures, misconfigured API_URL) should surface as a real error.
+    if (msg.includes('not found') || msg.includes('inactive') || msg.includes('not active')) {
+      notFound()
+    }
+    throw err
   }
 
   return <OrderingPageClient restaurant={restaurant} table={table} />

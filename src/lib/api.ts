@@ -1,4 +1,9 @@
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000'
+// Server components can use API_URL (server-only, set in Vercel env vars).
+// Client components fall back to NEXT_PUBLIC_API_URL (embedded at build time).
+const BASE =
+  (typeof window === 'undefined' ? process.env.API_URL : undefined) ??
+  process.env.NEXT_PUBLIC_API_URL ??
+  'http://localhost:3000'
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
