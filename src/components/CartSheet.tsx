@@ -51,7 +51,7 @@ export function CartSheet({ restaurant, table, onClose, onOrderPlaced }: Props) 
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
-      <div className="fixed bottom-0 inset-x-0 z-50 rounded-t-3xl shadow-float"
+      <div className="fixed bottom-0 inset-x-0 z-50 rounded-t-3xl shadow-float sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-[480px]"
         style={{ background: 'var(--color-background)', maxHeight: '85vh' }}>
         <div className="flex flex-col" style={{ maxHeight: '85vh' }}>
           {/* Header */}

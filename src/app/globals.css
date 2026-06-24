@@ -28,6 +28,9 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
+  @media (min-width: 640px) {
+    body { background-color: #e2e8f0; }
+  }
   html[dir="rtl"] body { font-family: var(--font-arabic); }
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; }
 }

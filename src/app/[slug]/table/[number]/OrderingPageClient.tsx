@@ -139,7 +139,8 @@ function Inner({ restaurant, table }: Props) {
   }
 
   return (
-    <div className="relative min-h-screen pb-32" style={{ background: 'var(--color-background)' }}>
+    <div className="min-h-screen sm:flex sm:justify-center" style={{ background: 'var(--color-background)' }}>
+    <div className="relative min-h-screen pb-32 w-full sm:max-w-[480px]" style={{ background: 'var(--color-background)' }}>
       <Toaster position="top-center" toastOptions={{ style: { fontFamily: 'var(--font-sans)' } }} />
 
       <HeroHeader restaurant={restaurant} tableNumber={table.table_number} />
@@ -203,6 +204,7 @@ function Inner({ restaurant, table }: Props) {
           onOrderPlaced={(order) => setPlacedOrders(prev => [...prev, order])}
         />
       )}
+    </div>
     </div>
   )
 }

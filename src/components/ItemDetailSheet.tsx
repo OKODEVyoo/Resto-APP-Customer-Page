@@ -32,7 +32,7 @@ export function ItemDetailSheet({ item, onClose }: Props) {
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
-      <div className="fixed bottom-0 inset-x-0 z-50 rounded-t-3xl shadow-float overflow-hidden"
+      <div className="fixed bottom-0 inset-x-0 z-50 rounded-t-3xl shadow-float overflow-hidden sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-[480px]"
         style={{ background: 'var(--color-background)', maxHeight: '90vh' }}>
         <div className="overflow-y-auto max-h-[90vh]">
           {item.image_url && (

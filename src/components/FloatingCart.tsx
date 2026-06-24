@@ -14,10 +14,10 @@ export function FloatingCart({ onOpen }: Props) {
   if (count === 0) return null
 
   return (
-    <div className="fixed bottom-6 inset-x-4 z-30">
+    <div className="fixed bottom-6 inset-x-0 z-30 px-4 sm:flex sm:justify-center">
       <button
         onClick={onOpen}
-        className="w-full flex items-center justify-between px-5 py-4 rounded-2xl shadow-float font-semibold text-white tap-highlight-none transition-transform active:scale-[0.98]"
+        className="w-full sm:max-w-[448px] flex items-center justify-between px-5 py-4 rounded-2xl shadow-float font-semibold text-white tap-highlight-none transition-transform active:scale-[0.98]"
         style={{ background: 'var(--color-button)' }}
       >
         <div className="flex items-center gap-3">
