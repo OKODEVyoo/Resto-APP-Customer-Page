@@ -1,38 +1,37 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MapPin, Lock, AlertCircle } from 'lucide-react'
 import { useLang } from '@/context/LangContext'
 import { getTranslations } from '@/lib/i18n'
-import { api } from '@/lib/api'
 import type { GeoStatus } from '@/lib/types'
 
+// Hardcoded bypass PIN — replace with per-restaurant config later
+const BYPASS_PIN = '0000'
+
 interface Props {
-  slug: string
   status: GeoStatus
   onRetry: () => void
   onBypass: () => void
 }
 
-export function GeoGate({ slug, status, onRetry, onBypass }: Props) {
+export function GeoGate({ status, onRetry, onBypass }: Props) {
   const { lang } = useLang()
   const tr = getTranslations(lang)
-  const [showPin, setShowPin] = useState(false)
   const [pin, setPin] = useState('')
   const [pinError, setPinError] = useState('')
-  const [verifying, setVerifying] = useState(false)
+  const [isDev, setIsDev] = useState(false)
 
-  async function handlePinSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    setIsDev(new URLSearchParams(window.location.search).get('dev') === 'true')
+  }, [])
+
+  function handlePinSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (pin.length < 4) return
-    setVerifying(true)
-    setPinError('')
-    try {
-      await api.verifyPin(slug, pin)
+    if (pin === BYPASS_PIN) {
       onBypass()
-    } catch {
+    } else {
       setPinError(tr.geo.pinError)
-    } finally {
-      setVerifying(false)
     }
   }
 
@@ -66,44 +65,46 @@ export function GeoGate({ slug, status, onRetry, onBypass }: Props) {
           {isOutside ? tr.geo.retry : tr.geo.enable}
         </button>
 
-        {/* PIN fallback */}
-        {!showPin ? (
+        {/* PIN input — always visible */}
+        <div className="rounded-2xl p-5 mb-3" style={{ background: 'var(--color-card)', border: '1.5px solid var(--color-accent)' }}>
+          <p className="text-sm font-semibold mb-1 flex items-center gap-1.5" style={{ color: 'var(--color-text)' }}>
+            <Lock className="w-3.5 h-3.5" />
+            {tr.geo.pinLabel}
+          </p>
+          <p className="text-xs mb-4" style={{ color: 'var(--color-secondary)', opacity: 0.75 }}>{tr.geo.pinBody}</p>
+          <form onSubmit={handlePinSubmit} className="flex gap-2">
+            <input
+              type="number"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={4}
+              value={pin}
+              onChange={e => { setPin(e.target.value.slice(0, 4)); setPinError('') }}
+              placeholder={tr.geo.pinPlaceholder}
+              className="flex-1 rounded-xl px-4 py-3 text-lg font-mono text-center border-2 outline-none transition-colors"
+              style={{ background: 'white', borderColor: pinError ? '#dc2626' : 'var(--color-accent)', color: 'var(--color-text)' }}
+            />
+            <button
+              type="submit"
+              disabled={pin.length < 4}
+              className="px-5 rounded-xl font-semibold text-sm disabled:opacity-40 transition-opacity"
+              style={{ background: 'var(--color-button)', color: '#fff' }}
+            >
+              {tr.geo.pinSubmit}
+            </button>
+          </form>
+          {pinError && <p className="text-xs mt-2" style={{ color: '#dc2626' }}>{pinError}</p>}
+        </div>
+
+        {/* Dev skip button — only with ?dev=true */}
+        {isDev && (
           <button
-            onClick={() => setShowPin(true)}
-            className="w-full py-3 rounded-2xl text-sm font-medium transition-opacity active:opacity-70"
-            style={{ background: 'var(--color-card)', color: 'var(--color-primary)', border: '1.5px solid var(--color-accent)' }}
+            onClick={onBypass}
+            className="w-full py-2.5 rounded-2xl text-xs font-medium opacity-60 hover:opacity-100 transition-opacity"
+            style={{ background: '#f3f4f6', color: '#374151', border: '1px dashed #9ca3af' }}
           >
-            <Lock className="inline w-4 h-4 mr-1.5 mb-0.5" />
-            {tr.geo.pinHint}
+            [DEV] Skip geo check
           </button>
-        ) : (
-          <div className="rounded-2xl p-5" style={{ background: 'var(--color-card)', border: '1.5px solid var(--color-accent)' }}>
-            <p className="text-sm font-semibold mb-1" style={{ color: 'var(--color-text)' }}>{tr.geo.pinLabel}</p>
-            <p className="text-xs mb-4" style={{ color: 'var(--color-secondary)', opacity: 0.75 }}>{tr.geo.pinBody}</p>
-            <form onSubmit={handlePinSubmit} className="flex gap-2">
-              <input
-                type="number"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={4}
-                value={pin}
-                onChange={e => { setPin(e.target.value.slice(0, 4)); setPinError('') }}
-                placeholder={tr.geo.pinPlaceholder}
-                className="flex-1 rounded-xl px-4 py-3 text-lg font-mono text-center border-2 outline-none focus:border-[var(--color-primary)] transition-colors"
-                style={{ background: 'white', borderColor: pinError ? '#dc2626' : 'var(--color-accent)', color: 'var(--color-text)' }}
-                autoFocus
-              />
-              <button
-                type="submit"
-                disabled={pin.length < 4 || verifying}
-                className="px-5 rounded-xl font-semibold text-sm disabled:opacity-40 transition-opacity"
-                style={{ background: 'var(--color-button)', color: '#fff' }}
-              >
-                {verifying ? '…' : tr.geo.pinSubmit}
-              </button>
-            </form>
-            {pinError && <p className="text-xs mt-2" style={{ color: '#dc2626' }}>{pinError}</p>}
-          </div>
         )}
       </div>
     </div>

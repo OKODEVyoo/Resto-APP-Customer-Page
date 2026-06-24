@@ -116,7 +116,6 @@ function Inner({ restaurant, table }: Props) {
     return (
       <LangProvider>
         <GeoGate
-          slug={restaurant.slug}
           status={geoStatus}
           onRetry={checkGeo}
           onBypass={() => setGeoStatus('bypassed')}
