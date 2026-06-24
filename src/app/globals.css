@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap");
+
+:root {
+  --font-display: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-arabic: "Noto Naskh Arabic", "Inter", sans-serif;
+
+  /* Default warm terracotta palette (overridden at runtime from restaurant.settings.palette) */
+  --color-primary: #f59e0b;
+  --color-secondary: #92400e;
+  --color-background: #fff7ed;
+  --color-text: #78350f;
+  --color-accent: #fbbf24;
+  --color-card: #fffbeb;
+  --color-button: #d97706;
+}
+
+@layer base {
+  html { background-color: var(--color-background); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  html[dir="rtl"] body { font-family: var(--font-arabic); }
+  h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .tap-highlight-none { -webkit-tap-highlight-color: transparent; }
+  .glass {
+    background-color: color-mix(in srgb, var(--color-background) 80%, transparent);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+  }
+}
