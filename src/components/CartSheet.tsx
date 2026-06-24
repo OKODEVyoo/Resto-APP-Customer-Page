@@ -35,6 +35,9 @@ export function CartSheet({ restaurant, table, onClose, onOrderPlaced }: Props) 
           special_notes: i.notes || undefined,
         })),
       })
+      const storageKey = `orders-${restaurant.slug}-${table.table_number}`
+      const existing: string[] = JSON.parse(localStorage.getItem(storageKey) ?? '[]')
+      localStorage.setItem(storageKey, JSON.stringify([order.id, ...existing]))
       setSuccess(true)
       clear()
       setTimeout(() => {
