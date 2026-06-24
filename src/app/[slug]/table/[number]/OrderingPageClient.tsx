@@ -64,6 +64,8 @@ function Inner({ restaurant, table }: Props) {
 
   // Geolocation check
   const checkGeo = useCallback(() => {
+    // geo_radius_meters >= 999999 means geo check is disabled for this restaurant
+    if (restaurant.geo_radius_meters >= 999999) { setGeoStatus('ok'); return }
     setGeoStatus('checking')
     if (!navigator.geolocation) { setGeoStatus('denied'); return }
     navigator.geolocation.getCurrentPosition(
