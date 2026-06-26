@@ -21,6 +21,7 @@ export function CartSheet({ restaurant, table, onClose, onOrderPlaced }: Props) 
   const tr = getTranslations(lang)
   const [placing, setPlacing] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [customerName, setCustomerName] = useState('')
 
   async function placeOrder() {
     if (items.length === 0) return
@@ -29,6 +30,7 @@ export function CartSheet({ restaurant, table, onClose, onOrderPlaced }: Props) 
       const order = await api.placeOrder({
         restaurant_id: restaurant.id,
         table_id: table.id,
+        customer_name: customerName.trim() || undefined,
         items: items.map(i => ({
           menu_item_id: i.menuItem.id,
           quantity: i.qty,
@@ -43,7 +45,7 @@ export function CartSheet({ restaurant, table, onClose, onOrderPlaced }: Props) 
       setTimeout(() => {
         onOrderPlaced(order)
         onClose()
-      }, 2000)
+      }, 2200)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error placing order')
     } finally {
@@ -53,22 +55,26 @@ export function CartSheet({ restaurant, table, onClose, onOrderPlaced }: Props) 
 
   return (
     <>
-      <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
-      <div className="fixed bottom-0 inset-x-0 z-50 rounded-t-3xl shadow-float sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-[480px]"
-        style={{ background: 'var(--color-background)', maxHeight: '85vh' }}>
-        <div className="flex flex-col" style={{ maxHeight: '85vh' }}>
+      <div className="fixed inset-0 z-40 bg-black/60" onClick={onClose} />
+      <div
+        className="fixed bottom-0 inset-x-0 z-50 rounded-t-3xl animate-slide-up sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-[480px]"
+        style={{ background: 'var(--color-background)', maxHeight: '88vh', boxShadow: '0 -8px 40px rgba(0,0,0,0.18)' }}
+      >
+        <div className="flex flex-col" style={{ maxHeight: '88vh' }}>
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'var(--color-accent)' }}>
+          <div className="flex items-center justify-between px-5 py-4 border-b flex-shrink-0"
+            style={{ borderColor: 'var(--color-accent)' }}>
             <h2 className="text-lg font-semibold" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
               {tr.cart.title}
             </h2>
-            <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'var(--color-card)' }}>
+            <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{ background: 'var(--color-card)' }}>
               <X className="w-4 h-4" style={{ color: 'var(--color-text)' }} />
             </button>
           </div>
 
           {success ? (
-            <div className="flex-1 flex flex-col items-center justify-center py-12 px-6">
+            <div className="flex-1 flex flex-col items-center justify-center py-12 px-6 animate-slide-up">
               <CheckCircle className="w-16 h-16 mb-4" style={{ color: 'var(--color-primary)' }} />
               <h3 className="text-xl font-semibold mb-2" style={{ fontFamily: 'var(--font-display)', color: 'var(--color-text)' }}>
                 {tr.order.success}
@@ -79,40 +85,54 @@ export function CartSheet({ restaurant, table, onClose, onOrderPlaced }: Props) 
             </div>
           ) : (
             <>
-              {/* Items */}
+              {/* Items list */}
               <div className="flex-1 overflow-y-auto px-5 py-3 space-y-3">
                 {items.length === 0 ? (
-                  <p className="text-center py-8 text-sm" style={{ color: 'var(--color-secondary)', opacity: 0.6 }}>{tr.cart.empty}</p>
+                  <p className="text-center py-8 text-sm" style={{ color: 'var(--color-secondary)', opacity: 0.6 }}>
+                    {tr.cart.empty}
+                  </p>
                 ) : items.map(item => {
                   const name = item.menuItem[`name_${lang}` as 'name_fr' | 'name_ar' | 'name_en'] || item.menuItem.name_fr
                   return (
-                    <div key={item.menuItem.id} className="rounded-2xl p-4 shadow-card" style={{ background: 'var(--color-card)' }}>
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <p className="font-medium text-sm leading-snug" style={{ color: 'var(--color-text)' }}>{name}</p>
-                        <button onClick={() => remove(item.menuItem.id)}>
-                          <Trash2 className="w-4 h-4" style={{ color: 'var(--color-secondary)', opacity: 0.5 }} />
-                        </button>
-                      </div>
-                      {item.notes && (
-                        <p className="text-xs italic mb-2" style={{ color: 'var(--color-secondary)', opacity: 0.65 }}>{item.notes}</p>
+                    <div key={item.menuItem.id} className="rounded-2xl p-3 shadow-sm flex gap-3"
+                      style={{ background: 'var(--color-card)' }}>
+                      {/* Thumbnail */}
+                      {item.menuItem.image_url ? (
+                        <img src={item.menuItem.image_url} alt={name}
+                          className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center text-xl"
+                          style={{ background: 'var(--color-accent)', opacity: 0.5 }}>🍽️</div>
                       )}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => updateQty(item.menuItem.id, item.qty - 1)}
-                            className="w-6 h-6 rounded-full flex items-center justify-center"
-                            style={{ background: 'var(--color-accent)' }}>
-                            <Minus className="w-3 h-3" style={{ color: 'var(--color-secondary)' }} />
-                          </button>
-                          <span className="w-5 text-center text-sm font-bold" style={{ color: 'var(--color-text)' }}>{item.qty}</span>
-                          <button onClick={() => updateQty(item.menuItem.id, item.qty + 1)}
-                            className="w-6 h-6 rounded-full flex items-center justify-center"
-                            style={{ background: 'var(--color-primary)' }}>
-                            <Plus className="w-3 h-3 text-white" />
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <p className="font-medium text-sm leading-snug" style={{ color: 'var(--color-text)' }}>{name}</p>
+                          <button onClick={() => remove(item.menuItem.id)} className="flex-shrink-0 mt-0.5">
+                            <Trash2 className="w-3.5 h-3.5" style={{ color: 'var(--color-secondary)', opacity: 0.45 }} />
                           </button>
                         </div>
-                        <span className="font-bold text-sm" style={{ color: 'var(--color-primary)' }}>
-                          {(parseFloat(item.menuItem.price) * item.qty).toFixed(2)} {tr.currency}
-                        </span>
+                        {item.notes && (
+                          <p className="text-xs italic mb-1.5" style={{ color: 'var(--color-secondary)', opacity: 0.6 }}>{item.notes}</p>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => updateQty(item.menuItem.id, item.qty - 1)}
+                              className="w-6 h-6 rounded-full flex items-center justify-center"
+                              style={{ background: 'var(--color-accent)' }}>
+                              <Minus className="w-3 h-3" style={{ color: 'var(--color-secondary)' }} />
+                            </button>
+                            <span className="w-5 text-center text-sm font-bold" style={{ color: 'var(--color-text)' }}>{item.qty}</span>
+                            <button onClick={() => updateQty(item.menuItem.id, item.qty + 1)}
+                              className="w-6 h-6 rounded-full flex items-center justify-center"
+                              style={{ background: 'var(--color-primary)' }}>
+                              <Plus className="w-3 h-3 text-white" />
+                            </button>
+                          </div>
+                          <span className="font-bold text-sm" style={{ color: 'var(--color-primary)' }}>
+                            {(parseFloat(item.menuItem.price) * item.qty).toFixed(2)} {tr.currency}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   )
@@ -121,7 +141,23 @@ export function CartSheet({ restaurant, table, onClose, onOrderPlaced }: Props) 
 
               {/* Footer */}
               {items.length > 0 && (
-                <div className="px-5 pt-3 pb-8 border-t" style={{ borderColor: 'var(--color-accent)' }}>
+                <div className="px-5 pt-3 pb-8 border-t flex-shrink-0" style={{ borderColor: 'var(--color-accent)' }}>
+                  {/* Customer name */}
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={e => setCustomerName(e.target.value)}
+                    placeholder="Votre prénom (optionnel)"
+                    className="w-full rounded-xl px-4 py-2.5 text-sm outline-none mb-3 transition-shadow"
+                    style={{
+                      background: 'var(--color-card)',
+                      color: 'var(--color-text)',
+                      border: '1.5px solid var(--color-accent)',
+                    }}
+                    onFocus={e => (e.target.style.borderColor = 'var(--color-primary)')}
+                    onBlur={e => (e.target.style.borderColor = 'var(--color-accent)')}
+                  />
+
                   <div className="flex justify-between mb-4">
                     <span className="font-medium text-sm" style={{ color: 'var(--color-text)' }}>{tr.cart.subtotal}</span>
                     <span className="font-bold" style={{ color: 'var(--color-primary)' }}>{total.toFixed(2)} {tr.currency}</span>

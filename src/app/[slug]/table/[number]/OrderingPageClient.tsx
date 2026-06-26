@@ -150,6 +150,28 @@ function Inner({ restaurant, table }: Props) {
       )}
 
       {/* Menu sections */}
+      {!menuLoaded && !menuError && (
+        <div className="px-4 pt-4 space-y-8">
+          {[1, 2].map(s => (
+            <div key={s}>
+              <div className="skeleton h-5 w-32 rounded-lg mb-3" />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {[1, 2, 3, 4].map(c => (
+                  <div key={c} className="rounded-2xl overflow-hidden" style={{ background: 'var(--color-card)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                    <div className="skeleton h-44 w-full" />
+                    <div className="px-3.5 pt-2.5 pb-3 space-y-2">
+                      <div className="skeleton h-4 w-3/4 rounded" />
+                      <div className="skeleton h-3 w-full rounded" />
+                      <div className="skeleton h-4 w-16 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {menuLoaded && categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
           <p className="text-6xl mb-5">🍽️</p>

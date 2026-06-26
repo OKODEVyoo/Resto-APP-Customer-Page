@@ -19,8 +19,13 @@ export function CategoryNav({ categories, activeId, onSelect }: Props) {
   }, [activeId])
 
   return (
-    <div className="sticky top-0 z-20 glass border-b" style={{ borderColor: 'var(--color-accent)', borderBottomWidth: '1px' }}>
-      <div ref={scrollRef} className="flex gap-1 px-4 py-2.5 overflow-x-auto no-scrollbar">
+    <div className="sticky top-0 z-20 border-b" style={{
+      borderColor: 'var(--color-accent)',
+      background: 'color-mix(in srgb, var(--color-background) 85%, transparent)',
+      backdropFilter: 'blur(16px) saturate(160%)',
+      WebkitBackdropFilter: 'blur(16px) saturate(160%)',
+    }}>
+      <div ref={scrollRef} className="flex gap-0 px-3 overflow-x-auto no-scrollbar">
         {categories.map(cat => {
           const name = cat[`name_${lang}` as 'name_fr' | 'name_ar' | 'name_en'] || cat.name_fr
           const isActive = cat.id === activeId
@@ -29,15 +34,19 @@ export function CategoryNav({ categories, activeId, onSelect }: Props) {
               key={cat.id}
               ref={isActive ? activeRef : undefined}
               onClick={() => onSelect(cat.id)}
-              className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all tap-highlight-none whitespace-nowrap"
-              style={{
-                background: isActive ? 'var(--color-primary)' : 'var(--color-card)',
-                color: isActive ? '#fff' : 'var(--color-text)',
-                boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
-                border: isActive ? 'none' : '1px solid var(--color-accent)',
-              }}
+              className="relative flex-shrink-0 px-4 py-3 text-sm font-medium transition-colors duration-150 tap-highlight-none whitespace-nowrap"
+              style={{ color: isActive ? 'var(--color-primary)' : 'var(--color-text)', fontWeight: isActive ? 600 : 400 }}
             >
               {name}
+              {/* Animated bottom indicator line */}
+              <span
+                className="absolute bottom-0 left-2 right-2 h-[2.5px] rounded-full transition-all duration-200"
+                style={{
+                  background: 'var(--color-primary)',
+                  opacity: isActive ? 1 : 0,
+                  transform: isActive ? 'scaleX(1)' : 'scaleX(0.4)',
+                }}
+              />
             </button>
           )
         })}
